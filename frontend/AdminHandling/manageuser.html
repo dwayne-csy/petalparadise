@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Role & Status Management</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/frontend/js/manageuser.js" defer></script>
+</head>
+<body>
+  <h2>Manage User Role & Status</h2>
+
+  <form id="userForm">
+    <input type="hidden" id="userId">
+
+    <select id="role" required>
+      <option value="" disabled selected>Select Role</option>
+      <option value="admin">Admin</option>
+      <option value="customer">Customer</option>
+    </select>
+
+    <select id="status" required>
+      <option value="" disabled selected>Select Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+    <button type="submit" id="submitBtn">Update</button>
+  </form>
+
+  <hr>
+
+  <table border="1" id="userTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Contact</th>
+        <th>Address</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</body>
+</html>

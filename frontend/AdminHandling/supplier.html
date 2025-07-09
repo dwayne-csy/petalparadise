@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Supplier Management</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/frontend/js/supplier.js" defer></script>
+</head>
+<body>
+  <h2>Supplier Management</h2>
+
+  <form id="supplierForm">
+    <input type="hidden" id="supplierId">
+    <input type="text" id="supplier_name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="phone" placeholder="Phone">
+    <input type="text" id="address" placeholder="Address">
+    <button type="submit" id="submitBtn">Add Supplier</button>
+  </form>
+
+  <hr>
+
+  <table border="1" id="supplierTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</body>
+</html>

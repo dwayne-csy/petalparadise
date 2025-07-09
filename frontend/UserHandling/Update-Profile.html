@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Profile</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <h2>Update Profile</h2>
+  <form id="profileForm" enctype="multipart/form-data">
+    <input type="text" name="name" id="fullName" placeholder="Full Name" required><br>
+    <input type="text" name="contact_number" id="phone" placeholder="Contact Number"><br>
+    <input type="text" name="address" id="address" placeholder="Address"><br>
+    
+    <input type="file" name="profile_image" id="avatar" accept="image/*"><br>
+    <img id="avatarPreview" style="max-width: 100px;"><br>
+
+    <button type="submit" id="updateBtn">Update</button>
+  </form>
+
+  <script src="/frontend/js/user.js"></script>
+</body>
+</html>

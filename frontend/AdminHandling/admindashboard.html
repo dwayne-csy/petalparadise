@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .dashboard-buttons {
+      margin-top: 20px;
+    }
+
+    .dashboard-buttons button {
+      display: block;
+      width: 250px;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #logout {
+      margin-top: 20px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  <p id="welcomeMsg"></p>
+
+  <div class="dashboard-buttons">
+    <button id="manageUsers">Manage Users</button>
+    <button id="manageProducts">Manage Products</button>
+    <button id="manageSuppliers">Manage Suppliers</button>
+    <button id="manageOrders">Manage Orders</button>
+    <button id="manageReviews">Manage Reviews</button>
+    <button id="salesChart">Sales Chart</button>
+  </div>
+
+  <button id="logout">Logout</button>
+
+  <script>
+    $(document).ready(function () {
+      const token = sessionStorage.getItem('token');
+      const userId = sessionStorage.getItem('userId');
+      const role = sessionStorage.getItem('role');
+
+      if (!token || !userId || role !== 'admin') {
+        sessionStorage.clear();
+        return window.location.href = "/frontend/Userhandling/login.html";
+      }
+
+      $("#welcomeMsg").text(`Welcome Admin (ID: ${userId})`);
+
+      
+
+      // Navigation buttons
+      $("#manageUsers").click(() => {
+        window.location.href = "/frontend/Adminhandling/manageuser.html";
+      });
+
+      $("#manageProducts").click(() => {
+        window.location.href = "/frontend/Adminhandling/product.html";
+      });
+
+      $("#manageSuppliers").click(() => {
+        window.location.href = "/frontend/Adminhandling/supplier.html";
+      });
+
+      $("#manageOrders").click(() => {
+        // Update this path when the orders page is ready
+        window.location.href = "/frontend/Adminhandling/orders.html";
+      });
+
+      $("#manageReviews").click(() => {
+        // Update this path when the reviews page is ready
+        window.location.href = "/frontend/Adminhandling/reviews.html";
+      });
+
+      $("#salesChart").click(() => {
+        // Update this path when the sales chart page is ready
+        window.location.href = "/frontend/Adminhandling/saleschart.html";
+      });
+
+      $("#logout").on("click", function () {
+        sessionStorage.clear();
+        window.location.href = "/frontend/Userhandling/login.html";
+      });
+    });
+  </script>
+</body>
+</html>
