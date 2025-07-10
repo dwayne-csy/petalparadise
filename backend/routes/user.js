@@ -1,19 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../utils/multer');
+const upload = require('../utils/multer'); 
 
-//for verify user authentication
-const { isAuthenticatedUser } = require('../middlewares/auth');
-
-//for VerifyAdmin
-const { verifyAdmin } = require('../middlewares/VerifyAdmin');
 
 // Controllers (separated)
 const { registerUser } = require('../controllers/RegisterController');
 const { loginUser } = require('../controllers/LoginController');
 const { updateUser, getProfile } = require('../controllers/ProfileController');
 const { deactivateUser } = require('../controllers/DeactivateUserController');
-const verifyToken = require('../middlewares/VerifyToken');
+//for VerifyAdmin
+const admin = require('../middlewares/admin');
+const auth = require('../middlewares/auth');
 
 
 
@@ -24,13 +21,13 @@ const verifyToken = require('../middlewares/VerifyToken');
 // Routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.post('/update-profile', isAuthenticatedUser, upload.single('image'), updateUser);
+router.post('/update-profile', auth, upload.single('image'), updateUser);
 
-router.get('/profile/:id', verifyToken, getProfile);
+router.get('/profile/:id', auth, getProfile);
 
 
 // Admin routes
-router.put('/deactivate', verifyAdmin, deactivateUser);
+router.put('/deactivate', admin, deactivateUser);
 
 
 module.exports = router;

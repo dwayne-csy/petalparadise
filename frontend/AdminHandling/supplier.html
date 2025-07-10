@@ -4,6 +4,24 @@
   <meta charset="UTF-8">
   <title>Supplier Management</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- ✅ Add this before loading supplier.js -->
+  <script>
+    $(document).ready(function () {
+      const token = sessionStorage.getItem('token');
+      const userId = sessionStorage.getItem('userId');
+      const role = sessionStorage.getItem('role');
+
+      if (!token || !userId || role !== 'admin') {
+        sessionStorage.clear();
+        return window.location.href = "/frontend/Userhandling/login.html";
+      }
+
+      // Optional: show admin ID or name somewhere
+      console.log(`Welcome Admin (ID: ${userId})`);
+    });
+  </script>
+
   <script src="/frontend/js/supplier.js" defer></script>
 </head>
 <body>
