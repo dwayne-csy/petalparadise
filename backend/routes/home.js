@@ -1,9 +1,8 @@
-// backend/routes/home.js
-
 const express = require('express');
 const router = express.Router();
-const homeController = require('../controllers/HomeController');
+const HomeController = require('../controllers/HomeController');
 
-router.get('/home', homeController);
+// Public home route to get products (no auth)
+router.get('/home', HomeController.getHomeData);
 
 module.exports = router;

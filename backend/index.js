@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+
 // ✅ Connect to database
 require('./config/db');
 
@@ -13,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Serve static frontend and uploaded images
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
-app.use('/uploads', express.static('uploads'));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // ✅ Import route files
 const userRoutes = require('./routes/user');
@@ -22,8 +23,11 @@ const adminRoutes = require('./routes/admindashboard');
 const productRoutes = require('./routes/product');
 const supplierRoutes = require('./routes/supplier');
 const manageuserRoutes = require('./routes/manageuser');
+const cartRoutes = require('./routes/cart');
+
 
 // ✅ Mount routes under same API version prefix
+app.use('/api/v1/', cartRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1', homeRoutes);
 app.use('/api/v1', adminRoutes);

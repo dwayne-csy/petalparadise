@@ -4,24 +4,24 @@ $(document).ready(function () {
     const productApi = 'http://localhost:4000/api/v1/product';
     const supplierApi = 'http://localhost:4000/api/v1/supplier';
 
+    // Check authentication
     if (!token || !userId) {
-        return window.location.href = "/frontend/Userhandling/login.html";
+        sessionStorage.clear();
+        window.location.href = "/frontend/Userhandling/login.html";
+        return;
     }
 
-    // ✅ Check if user really is admin
+    // Check admin status and load data
     $.ajax({
         method: "GET",
         url: `http://localhost:4000/api/v1/profile/${userId}`,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         success: function (res) {
             if (res.user.role !== 'admin') {
                 sessionStorage.clear();
-                return window.location.href = "/frontend/Userhandling/home.html";
+                window.location.href = "/frontend/Userhandling/home.html";
+                return;
             }
-
-            // User is admin → load products & suppliers
             loadProducts();
             loadSuppliers();
         },
@@ -35,11 +35,9 @@ $(document).ready(function () {
         $.ajax({
             url: supplierApi,
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Authorization': `Bearer ${token}` },
             success: function (data) {
-                let options = `<option value="">-- Supplier (Optional) --</option>`;
+                let options = '<option value="">-- Supplier (Optional) --</option>';
                 data.forEach(supplier => {
                     options += `<option value="${supplier.id}">${supplier.supplier_name}</option>`;
                 });
@@ -51,116 +49,150 @@ $(document).ready(function () {
         });
     }
 
-    function loadProducts() {
-        $.ajax({
-            url: productApi,
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            success: function (data) {
-                let rows = '';
-                data.forEach((p, i) => {
-                    const imageTag = p.image ? `<img src="http://localhost:4000/uploads/${p.image}" width="50" height="50">` : '';
-                    rows += `
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${p.name}</td>
-                            <td>${p.category}</td>
-                            <td>${p.usage_type}</td>
-                            <td>${p.sell_price}</td>
-                            <td>${p.stock}</td>
-                            <td>${imageTag}</td>
-                            <td>${p.supplier_id || ''}</td>
-                            <td>
-                                <button class="editBtn" data-id="${p.id}">Edit</button>
-                                <button class="deleteBtn" data-id="${p.id}">Delete</button>
-                            </td>
-                        </tr>`;
-                });
-                $('#productTable tbody').html(rows);
-            },
-            error: function () {
-                alert('Failed to load products');
-            }
-        });
-    }
+function loadProducts() {
+    $.ajax({
+        url: 'http://localhost:4000/api/v1/home',
+        method: 'GET',
+        success: function (data) {
+            let rows = '';
+            data.products.forEach((product, index) => {
+                let imageDisplay = '';
+                if (product.image) {
+                    const firstImage = product.image.split(',')[0];
+                    imageDisplay = `<img src="/frontend/images/${firstImage}" width="50" height="50">`;
+                }
 
+                rows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.usage_type}</td>
+                        <td>$${product.sell_price}</td>
+                        <td>${product.stock}</td>
+                        <td>${imageDisplay}</td>
+                        <td>
+                            <button class="addToCartBtn" data-id="${product.id}">Add to Cart</button>
+                        </td>
+                    </tr>`;
+            });
+            $('#productTable tbody').html(rows);
+
+            // ⭐ Add click handler for Add to Cart buttons
+            $('.addToCartBtn').on('click', function () {
+                const productId = $(this).data('id');
+                $.ajax({
+                    url: 'http://localhost:4000/api/v1/cart',
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: productId, quantity: 1 }),
+                    success: function () {
+                        alert('Product added to cart!');
+                    },
+                    error: function (err) {
+                        console.error('Add to cart error:', err);
+                        alert('Failed to add to cart');
+                    }
+                });
+            });
+        },
+        error: function (err) {
+            console.error('Error loading products:', err);
+            alert('Failed to load products');
+        }
+    });
+}
+    // Handle form submission
     $('#productForm').submit(function (e) {
         e.preventDefault();
-
-        const id = $('#productId').val();
         const formData = new FormData(this);
+        const productId = $('#productId').val();
+        const isEdit = !!productId;
 
-        const url = id ? `${productApi}/${id}` : productApi;
-        const method = id ? 'PUT' : 'POST';
+        // Log form data for debugging
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
 
         $.ajax({
-            url,
-            method,
+            url: isEdit ? `${productApi}/${productId}` : productApi,
+            method: isEdit ? 'PUT' : 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            success: function () {
-                alert(id ? 'Product updated!' : 'Product added!');
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function (response) {
+                alert(isEdit ? 'Product updated successfully!' : 'Product added successfully!');
                 $('#productForm')[0].reset();
                 $('#productId').val('');
                 $('#submitBtn').text('Add Product');
                 loadProducts();
             },
             error: function (err) {
-                alert('Error: ' + (err.responseJSON?.error || 'Upload failed'));
+                console.error('Error:', err);
+                let errorMsg = 'Operation failed. Please try again.';
+                if (err.responseJSON && err.responseJSON.error) {
+                    errorMsg = err.responseJSON.error;
+                    if (err.responseJSON.details) {
+                        errorMsg += ` (${err.responseJSON.details})`;
+                    }
+                }
+                alert(errorMsg);
             }
         });
     });
 
+    // Edit product
     $(document).on('click', '.editBtn', function () {
-        const id = $(this).data('id');
+        const productId = $(this).data('id');
         $.ajax({
-            url: `${productApi}/${id}`,
+            url: `${productApi}/${productId}`,
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            success: function (p) {
-                $('#productId').val(p.id);
-                $('#name').val(p.name);
-                $('#category').val(p.category);
-                $('#usage_type').val(p.usage_type);
-                $('#description').val(p.description);
-                $('#cost_price').val(p.cost_price);
-                $('#sell_price').val(p.sell_price);
-                $('#color').val(p.color);
-                $('#stock').val(p.stock);
-                $('#supplier_id').val(p.supplier_id);
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function (product) {
+                // Fill form with product data
+                $('#productId').val(product.id);
+                $('#name').val(product.name);
+                $('#category').val(product.category);
+                $('#usage_type').val(product.usage_type);
+                $('#description').val(product.description);
+                $('#cost_price').val(product.cost_price);
+                $('#sell_price').val(product.sell_price);
+                $('#color').val(product.color);
+                $('#stock').val(product.stock);
+                $('#supplier_id').val(product.supplier_id);
                 $('#submitBtn').text('Update Product');
+                
+                // Scroll to form
+                $('html, body').animate({
+                    scrollTop: $('#productForm').offset().top
+                }, 500);
             },
-            error: function () {
+            error: function (err) {
+                console.error('Error loading product:', err);
                 alert('Failed to load product details');
             }
         });
     });
 
+    // Delete product
     $(document).on('click', '.deleteBtn', function () {
-        const id = $(this).data('id');
-        if (confirm('Delete this product?')) {
-            $.ajax({
-                url: `${productApi}/${id}`,
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function () {
-                    alert('Product deleted!');
-                    loadProducts();
-                },
-                error: function () {
-                    alert('Failed to delete product');
-                }
-            });
-        }
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        
+        const productId = $(this).data('id');
+        $.ajax({
+            url: `${productApi}/${productId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function () {
+                alert('Product deleted successfully');
+                loadProducts();
+            },
+            error: function (err) {
+                console.error('Error deleting product:', err);
+                alert('Failed to delete product');
+            }
+        });
     });
 });

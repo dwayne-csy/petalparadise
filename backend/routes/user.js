@@ -21,7 +21,8 @@ const auth = require('../middlewares/auth');
 // Routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.post('/update-profile', auth, upload.single('image'), updateUser);
+
+router.post('/profile', auth, upload.single('profile_image'), updateUser);
 
 router.get('/profile/:id', auth, getProfile);
 

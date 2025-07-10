@@ -141,7 +141,7 @@ $("#login").on('click', function (e) {
 
         $.ajax({
             method: "POST",
-            url: `http://localhost:4000/api/v1/update-profile`,
+            url: `http://localhost:4000/api/v1/profile`,
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             },

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Cart</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/frontend/js/cart.js" defer></script>
+  <style>
+    table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+    th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: center; }
+    button { margin: 0 2px; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>🛒 My Cart</h2>
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Product</th>
+        <th>Image</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Cart items will be inserted here by cart.js -->
+    </tbody>
+  </table>
+  <div style="text-align: center;">
+    <button id="backBtn">⬅️ Back to Home</button>
+  </div>
+</body>
+</html>
