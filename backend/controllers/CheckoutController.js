@@ -1,59 +1,46 @@
 const db = require('../config/db');
 
-// Solo checkout: create pending order, add items, then decrease stock
+// 🛒 Solo checkout
 exports.checkoutSolo = (req, res) => {
     const userId = req.user.id;
 
     const getSoloSql = "SELECT id, sell_price FROM products WHERE category = 'Solo'";
     db.query(getSoloSql, (err, soloProducts) => {
-        if (err) {
-            console.error('DB error:', err);
-            return res.status(500).json({ message: 'Failed to get solo products' });
-        }
+        if (err) return res.status(500).json({ message: 'DB error' });
         if (soloProducts.length === 0) {
             return res.status(400).json({ message: 'No solo products found' });
         }
 
         const createOrderSql = 'INSERT INTO orders (user_id, status, created_at, updated_at) VALUES (?, "pending", NOW(), NOW())';
         db.query(createOrderSql, [userId], (err, orderResult) => {
-            if (err) {
-                console.error('Failed to create order:', err);
-                return res.status(500).json({ message: 'Failed to create order' });
-            }
+            if (err) return res.status(500).json({ message: 'Failed to create order' });
+
             const orderId = orderResult.insertId;
 
-            const insertItemsSql = 'INSERT INTO order_items (order_id, product_id, quantity, price, created_at, updated_at) VALUES ?';
+            // add order items
             const values = soloProducts.map(prod => [orderId, prod.id, 1, prod.sell_price, new Date(), new Date()]);
+            const insertItemsSql = 'INSERT INTO order_items (order_id, product_id, quantity, price, created_at, updated_at) VALUES ?';
             db.query(insertItemsSql, [values], (err) => {
-                if (err) {
-                    console.error('Failed to insert order_items:', err);
-                    return res.status(500).json({ message: 'Failed to add order items' });
-                }
+                if (err) return res.status(500).json({ message: 'Failed to add order items' });
 
-                // ✅ Now update stock: decrease by 1 for each product
-                const stockUpdates = soloProducts.map(prod => {
-                    return new Promise((resolve, reject) => {
+                // decrease stock
+                const stockUpdates = soloProducts.map(prod =>
+                    new Promise((resolve, reject) => {
                         db.query('UPDATE products SET stock = stock - 1 WHERE id = ?', [prod.id], (err) => {
-                            if (err) reject(err);
-                            else resolve();
+                            if (err) reject(err); else resolve();
                         });
-                    });
-                });
+                    })
+                );
 
                 Promise.all(stockUpdates)
-                .then(() => {
-                    res.json({ message: 'Solo checkout prepared', orderId });
-                })
-                .catch(err => {
-                    console.error('Failed to update stock:', err);
-                    res.status(500).json({ message: 'Failed to update product stock' });
-                });
+                    .then(() => res.json({ message: 'Solo checkout prepared', orderId }))
+                    .catch(err => res.status(500).json({ message: 'Failed to update product stock' }));
             });
         });
     });
 };
 
-// Cart checkout: create pending order, add items, then decrease stock
+// 🛒 Cart checkout
 exports.checkoutCart = (req, res) => {
     const userId = req.user.id;
 
@@ -64,67 +51,48 @@ exports.checkoutCart = (req, res) => {
         WHERE c.user_id = ?
     `;
     db.query(getCartSql, [userId], (err, cartItems) => {
-        if (err) {
-            console.error('DB error:', err);
-            return res.status(500).json({ message: 'Failed to get cart items' });
-        }
+        if (err) return res.status(500).json({ message: 'DB error' });
         if (cartItems.length === 0) {
             return res.status(400).json({ message: 'Your cart is empty' });
         }
 
         const createOrderSql = 'INSERT INTO orders (user_id, status, created_at, updated_at) VALUES (?, "pending", NOW(), NOW())';
         db.query(createOrderSql, [userId], (err, orderResult) => {
-            if (err) {
-                console.error('Failed to create order:', err);
-                return res.status(500).json({ message: 'Failed to create order' });
-            }
+            if (err) return res.status(500).json({ message: 'Failed to create order' });
+
             const orderId = orderResult.insertId;
 
-            const insertItemsSql = 'INSERT INTO order_items (order_id, product_id, quantity, price, created_at, updated_at) VALUES ?';
             const values = cartItems.map(item => [orderId, item.product_id, item.quantity, item.sell_price, new Date(), new Date()]);
+            const insertItemsSql = 'INSERT INTO order_items (order_id, product_id, quantity, price, created_at, updated_at) VALUES ?';
             db.query(insertItemsSql, [values], (err) => {
-                if (err) {
-                    console.error('Failed to insert order_items:', err);
-                    return res.status(500).json({ message: 'Failed to add order items' });
-                }
+                if (err) return res.status(500).json({ message: 'Failed to add order items' });
 
-                // ✅ Now update stock: decrease stock by quantity
-                const stockUpdates = cartItems.map(item => {
-                    return new Promise((resolve, reject) => {
+                // decrease stock
+                const stockUpdates = cartItems.map(item =>
+                    new Promise((resolve, reject) => {
                         db.query('UPDATE products SET stock = stock - ? WHERE id = ?', [item.quantity, item.product_id], (err) => {
-                            if (err) reject(err);
-                            else resolve();
+                            if (err) reject(err); else resolve();
                         });
-                    });
-                });
+                    })
+                );
 
                 Promise.all(stockUpdates)
-                .then(() => {
-                    // Clear cart after stock update
-                    db.query('DELETE FROM cart_items WHERE user_id = ?', [userId], (err) => {
-                        if (err) {
-                            console.error('Failed to clear cart:', err);
-                            return res.status(500).json({ message: 'Checked out but failed to clear cart' });
-                        }
-                        res.json({ message: 'Cart checkout prepared', orderId });
-                    });
-                })
-                .catch(err => {
-                    console.error('Failed to update stock:', err);
-                    res.status(500).json({ message: 'Failed to update product stock' });
-                });
+                    .then(() => {
+                        // clear cart
+                        db.query('DELETE FROM cart_items WHERE user_id = ?', [userId], (err) => {
+                            if (err) return res.status(500).json({ message: 'Checked out but failed to clear cart' });
+                            res.json({ message: 'Cart checkout prepared', orderId });
+                        });
+                    })
+                    .catch(err => res.status(500).json({ message: 'Failed to update product stock' }));
             });
         });
     });
 };
 
-// getCheckoutDetails and confirmCheckout stay the same, as you already have them clean
-
-
-// Get checkout details: get latest pending order items
+// 📦 Get checkout details (latest pending order)
 exports.getCheckoutDetails = (req, res) => {
     const userId = req.user.id;
-
     const sql = `
         SELECT oi.*, p.name, p.image, p.sell_price
         FROM order_items oi
@@ -134,17 +102,12 @@ exports.getCheckoutDetails = (req, res) => {
         )
     `;
     db.query(sql, [userId], (err, items) => {
-        if (err) {
-            console.error('Failed to load checkout details:', err);
-            return res.status(500).json({ message: 'Could not load checkout items' });
-        }
+        if (err) return res.status(500).json({ message: 'Could not load checkout items' });
         res.json({ checkout: items });
     });
 };
 
-// Confirm checkout: customer provides shipping_address & payment_method, updates order to 'confirmed'
-// Confirm checkout: automatically use user's address as shipping_address, update order to 'confirmed'
-// Confirm checkout: set payment_method & shipping_address, keep status 'pending'
+// ✅ Confirm checkout
 exports.confirmCheckout = (req, res) => {
     const { orderId, payment_method } = req.body;
     const userId = req.user.id;
@@ -153,36 +116,25 @@ exports.confirmCheckout = (req, res) => {
         return res.status(400).json({ message: 'Order ID and payment method are required' });
     }
 
-    // Step 1: get user's address
     const getUserAddressSql = 'SELECT address FROM users WHERE id = ? AND status="active" LIMIT 1';
     db.query(getUserAddressSql, [userId], (err, userResult) => {
-        if (err) {
-            console.error('Failed to get user address:', err);
-            return res.status(500).json({ message: 'Failed to get user address' });
-        }
+        if (err) return res.status(500).json({ message: 'Failed to get user address' });
         if (userResult.length === 0 || !userResult[0].address) {
             return res.status(400).json({ message: 'User address not found or empty' });
         }
 
         const userAddress = userResult[0].address;
 
-        // Step 2: update payment_method and shipping_address, but keep status as 'pending'
         const updateOrderSql = `
             UPDATE orders
-            SET shipping_address = ?,
-                payment_method = ?,
-                updated_at = NOW()
+            SET shipping_address = ?, payment_method = ?, updated_at = NOW()
             WHERE id = ? AND user_id = ?
         `;
         db.query(updateOrderSql, [userAddress, payment_method, orderId, userId], (err, result) => {
-            if (err) {
-                console.error('Failed to update order:', err);
-                return res.status(500).json({ message: 'Failed to update order' });
-            }
+            if (err) return res.status(500).json({ message: 'Failed to confirm order' });
             if (result.affectedRows === 0) {
                 return res.status(400).json({ message: 'Order not found or does not belong to you' });
             }
-
             res.json({ message: 'Order placed successfully! Status is pending, waiting for admin confirmation.' });
         });
     });

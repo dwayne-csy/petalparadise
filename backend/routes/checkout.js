@@ -9,4 +9,5 @@ router.get('/checkout', auth, CheckoutController.getCheckoutDetails);
 router.post('/checkout', auth, CheckoutController.confirmCheckout);
 
 
+
 module.exports = router;
