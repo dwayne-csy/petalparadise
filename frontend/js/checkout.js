@@ -47,19 +47,21 @@ $(document).ready(function () {
     }
 
     $('#placeOrderBtn').on('click', function () {
-        const shipping_address = $('#shippingAddress').val();
         const payment_method = $('#paymentMethod').val();
 
-        if (!shipping_address || !payment_method) {
-            return alert('Please enter shipping address and select payment method');
+        if (!payment_method) {
+            return alert('Please select a payment method');
         }
+
+        // disable button while processing
+        $('#placeOrderBtn').prop('disabled', true).text('Placing order...');
 
         $.ajax({
             url: 'http://localhost:4000/api/v1/checkout',
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             contentType: 'application/json',
-            data: JSON.stringify({ orderId, shipping_address, payment_method }),
+            data: JSON.stringify({ orderId, payment_method }),
             success: function (res) {
                 alert(res.message || 'Order confirmed!');
                 sessionStorage.removeItem('pendingOrderId');
@@ -68,6 +70,7 @@ $(document).ready(function () {
             error: function (err) {
                 console.error('Failed to confirm order', err);
                 alert('Could not confirm order');
+                $('#placeOrderBtn').prop('disabled', false).text('Place Order'); // re-enable on error
             }
         });
     });
