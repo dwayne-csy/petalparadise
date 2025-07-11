@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/frontend/js/checkout.js" defer></script>
+</head>
+<body>
+  <h2>Checkout</h2>
+
+  <table border="1" id="checkoutTable">
+    <thead>
+      <tr>
+        <th>#</th><th>Product</th><th>Qty</th><th>Price</th><th>Image</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>Shipping & Payment</h3>
+  <label>Shipping Address:</label><br>
+  <input type="text" id="shippingAddress" placeholder="Enter shipping address"><br><br>
+
+  <label>Payment Method:</label><br>
+  <select id="paymentMethod">
+    <option value="">-- Select Payment Method --</option>
+    <option value="GCash">GCash</option>
+    <option value="Cash on Delivery">Cash on Delivery</option>
+    <option value="PayMaya">PayMaya</option>
+  </select><br><br>
+
+  <button id="placeOrderBtn">Place Order</button>
+  <button id="backBtn">Back to Home</button>
+</body>
+</html>

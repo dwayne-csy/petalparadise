@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Order Management</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+    $(document).ready(function () {
+      const token = sessionStorage.getItem('token');
+      const userId = sessionStorage.getItem('userId');
+      const role = sessionStorage.getItem('role');
+
+      if (!token || !userId || role !== 'admin') {
+        sessionStorage.clear();
+        return window.location.href = "/frontend/Userhandling/login.html";
+      }
+
+      // Optional: show admin ID or name somewhere
+      console.log(`Welcome Admin (ID: ${userId})`);
+    });
+  </script>
+
+  <script src="/frontend/js/order.js" defer></script>
+</head>
+<body>
+  <h2>Customer Orders</h2>
+  <table border="1" id="orderTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Order ID</th>
+        <th>User ID</th>
+        <th>Status</th>
+        <th>Shipping Address</th>
+        <th>Payment Method</th>
+        <th>Total Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</body>
+</html>

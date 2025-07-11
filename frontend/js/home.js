@@ -19,7 +19,7 @@ $(document).ready(function () {
 
             console.log(`Welcome, ${res.user.name}`);
             $("#editProfileBtn").on('click', () => {
-                window.location.href = "/frontend/Userhandling/update-profile.html";
+                window.location.href = "/frontend/Userhandling/profile.html";
             });
 
             loadProducts();
@@ -86,6 +86,23 @@ $(document).ready(function () {
         });
     }
 
+$('#checkoutSoloBtn').on('click', function() {
+    const token = sessionStorage.getItem('token');
+    $.ajax({
+        url: 'http://localhost:4000/api/v1/checkout/solo',
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        success: function(res) {
+            sessionStorage.setItem('pendingOrderId', res.orderId);
+            window.location.href = "/frontend/Userhandling/checkout.html";
+        },
+        error: function(err) {
+            alert(err.responseJSON?.message || 'Failed to prepare checkout');
+        }
+    });
+});
+
+
     // 🚀 Logout
     $("#logoutBtn").on('click', () => {
         sessionStorage.clear();
@@ -94,5 +111,9 @@ $(document).ready(function () {
 
     $("#viewCartBtn").on('click', () => {
     window.location.href = "/frontend/Userhandling/cart.html";
+});
+
+$('#checkoutBtn').on('click', () => {
+    window.location.href = "/frontend/Userhandling/checkout.html";
 });
 });

@@ -24,6 +24,8 @@ const productRoutes = require('./routes/product');
 const supplierRoutes = require('./routes/supplier');
 const manageuserRoutes = require('./routes/manageuser');
 const cartRoutes = require('./routes/cart');
+const checkoutRoutes = require('./routes/checkout');
+const orderRoutes = require('./routes/order');
 
 
 // ✅ Mount routes under same API version prefix
@@ -34,6 +36,8 @@ app.use('/api/v1', adminRoutes);
 app.use('/api/v1', productRoutes);
 app.use('/api/v1', supplierRoutes);
 app.use('/api/v1', manageuserRoutes);
+app.use('/api/v1', checkoutRoutes);
+app.use('/api/v1', orderRoutes);
 
 
 // ✅ Start server
