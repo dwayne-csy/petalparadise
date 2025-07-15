@@ -1,81 +1,82 @@
 $(document).ready(function () {
     const token = sessionStorage.getItem('token');
-    const orderId = sessionStorage.getItem('pendingOrderId'); // get pending orderId
+    const orderId = sessionStorage.getItem('pendingOrderId');
 
-    if (!token) {
-        return window.location.href = "/frontend/Userhandling/login.html";
+    if (!token || !orderId) {
+        alert("No pending order found. Please checkout first.");
+        return window.location.href = "/frontend/Userhandling/home.html";
     }
 
-    loadCheckout();
+    // Load checkout details
+    $.ajax({
+        url: 'http://localhost:4000/api/v1/checkout',
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` },
+        success: function (res) {
+            const checkout = res.checkout;
+            if (!checkout || !checkout.length) {
+                alert('No checkout items found.');
+                return window.location.href = "/frontend/Userhandling/home.html";
+            }
 
-    function loadCheckout() {
-        $.ajax({
-            url: 'http://localhost:4000/api/v1/checkout',
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` },
-            success: function (res) {
-                let rows = '';
-                let total = 0;
+            // ✅ Show user address immediately
+            if (res.userAddress) {
+                $('#userAddress').text(res.userAddress);
+            } else {
+                $('#userAddress').text('Address not found');
+            }
 
-                res.checkout.forEach((item, index) => {
-                    const subtotal = item.sell_price * item.quantity;
-                    total += subtotal;
-                    const image = item.image ? `<img src="/frontend/images/${item.image.split(',')[0]}" width="50">` : '';
-
-                    rows += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${item.name}</td>
-                            <td>${item.quantity}</td>
-                            <td>$${item.sell_price}</td>
-                            <td>${image}</td>
-                        </tr>`;
-                });
-
+            let rows = '';
+            let total = 0;
+            checkout.forEach((item, index) => {
+                total += Number(item.price) * item.quantity;
+                const image = item.image 
+                    ? `<img src="/frontend/images/${item.image.split(',')[0]}" width="50" height="50" />`
+                    : '';
                 rows += `
                     <tr>
-                        <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
-                        <td colspan="2"><strong>$${total.toFixed(2)}</strong></td>
-                    </tr>`;
-                $('#checkoutTable tbody').html(rows);
-            },
-            error: function (err) {
-                console.error('Could not load checkout items', err);
-                alert('Could not load checkout items');
-            }
-        });
-    }
+                        <td>${index + 1}</td>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.price}</td>
+                        <td>${image}</td>
+                    </tr>
+                `;
+            });
 
-    $('#placeOrderBtn').on('click', function () {
-        const payment_method = $('#paymentMethod').val();
-
-        if (!payment_method) {
-            return alert('Please select a payment method');
+            $('#checkoutTable tbody').html(rows);
+            $('#totalAmount').text(`$${total.toFixed(2)}`);
+        },
+        error: function (err) {
+            console.error('Failed to load checkout details:', err);
+            alert(err.responseJSON?.message || 'Could not load checkout details.');
+            window.location.href = "/frontend/Userhandling/home.html";
         }
+    });
 
-        // disable button while processing
-        $('#placeOrderBtn').prop('disabled', true).text('Placing order...');
-
+    // Confirm checkout
+    $('#confirmCheckoutBtn').on('click', function () {
         $.ajax({
-            url: 'http://localhost:4000/api/v1/checkout',
+            url: 'http://localhost:4000/api/v1/checkout/confirm',
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             contentType: 'application/json',
-            data: JSON.stringify({ orderId, payment_method }),
+            data: JSON.stringify({ orderId }),
             success: function (res) {
-                alert(res.message || 'Order confirmed!');
+                alert(res.message);
                 sessionStorage.removeItem('pendingOrderId');
                 window.location.href = "/frontend/Userhandling/home.html";
             },
             error: function (err) {
-                console.error('Failed to confirm order', err);
-                alert('Could not confirm order');
-                $('#placeOrderBtn').prop('disabled', false).text('Place Order'); // re-enable on error
+                console.error('Failed to confirm checkout:', err);
+                alert(err.responseJSON?.message || 'Could not confirm order.');
             }
         });
     });
 
-    $('#backBtn').on('click', () => {
+    // Cancel
+    $('#cancelCheckoutBtn').on('click', function () {
+        sessionStorage.removeItem('pendingOrderId');
         window.location.href = "/frontend/Userhandling/home.html";
     });
 });

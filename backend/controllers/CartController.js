@@ -39,7 +39,7 @@ exports.getCart = (req, res) => {
     const userId = req.user.id;
 
     const sql = `
-        SELECT c.id, c.quantity, p.name, p.sell_price, p.image
+        SELECT c.id AS cart_item_id, c.quantity, p.id AS product_id, p.name, p.sell_price, p.image
         FROM cart_items c
         JOIN products p ON c.product_id = p.id
         WHERE c.user_id = ?
@@ -70,7 +70,7 @@ exports.removeFromCart = (req, res) => {
 
 // ➕ Increment quantity
 exports.incrementQuantity = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; // id = cart_items.id
     db.query('UPDATE cart_items SET quantity = quantity + 1 WHERE id = ?', [id], (err, result) => {
         if (err) {
             console.error('Failed to increment:', err);
@@ -80,10 +80,9 @@ exports.incrementQuantity = (req, res) => {
     });
 };
 
-
 // ➖ Decrement quantity (won't go below 1)
 exports.decrementQuantity = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; // id = cart_items.id
     db.query('UPDATE cart_items SET quantity = quantity - 1 WHERE id = ? AND quantity > 1', [id], (err, result) => {
         if (err) {
             console.error('Failed to decrement:', err);

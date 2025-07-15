@@ -31,7 +31,7 @@ $(document).ready(function () {
         }
     });
 
-    function loadSuppliers() {
+    function loadSuppliers(selectedSupplierId = null) {
         $.ajax({
             url: supplierApi,
             method: 'GET',
@@ -39,7 +39,8 @@ $(document).ready(function () {
             success: function (data) {
                 let options = '<option value="">-- Supplier (Optional) --</option>';
                 data.forEach(supplier => {
-                    options += `<option value="${supplier.id}">${supplier.supplier_name}</option>`;
+                    const selected = supplier.id == selectedSupplierId ? 'selected' : '';
+                    options += `<option value="${supplier.id}" ${selected}>${supplier.supplier_name}</option>`;
                 });
                 $('#supplier_id').html(options);
             },
@@ -49,68 +50,52 @@ $(document).ready(function () {
         });
     }
 
-function loadProducts() {
-    $.ajax({
-        url: 'http://localhost:4000/api/v1/home',
-        method: 'GET',
-        success: function (data) {
-            let rows = '';
-            data.products.forEach((product, index) => {
-                let imageDisplay = '';
-                if (product.image) {
-                    const firstImage = product.image.split(',')[0];
-                    imageDisplay = `<img src="/frontend/images/${firstImage}" width="50" height="50">`;
-                }
-
-                rows += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${product.name}</td>
-                        <td>${product.category}</td>
-                        <td>${product.usage_type}</td>
-                        <td>$${product.sell_price}</td>
-                        <td>${product.stock}</td>
-                        <td>${imageDisplay}</td>
-                        <td>
-                            <button class="addToCartBtn" data-id="${product.id}">Add to Cart</button>
-                        </td>
-                    </tr>`;
-            });
-            $('#productTable tbody').html(rows);
-
-            // ⭐ Add click handler for Add to Cart buttons
-            $('.addToCartBtn').on('click', function () {
-                const productId = $(this).data('id');
-                $.ajax({
-                    url: 'http://localhost:4000/api/v1/cart',
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    contentType: 'application/json',
-                    data: JSON.stringify({ productId: productId, quantity: 1 }),
-                    success: function () {
-                        alert('Product added to cart!');
-                    },
-                    error: function (err) {
-                        console.error('Add to cart error:', err);
-                        alert('Failed to add to cart');
+    function loadProducts() {
+        $.ajax({
+            url: productApi,   // ✅ use productApi instead of /home
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function (data) {
+                let rows = '';
+                data.forEach((product, index) => {
+                    let imageDisplay = '';
+                    if (product.image) {
+                        const firstImage = product.image.split(',')[0];
+                        imageDisplay = `<img src="/frontend/images/${firstImage}" width="50" height="50">`;
                     }
+
+                    rows += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${product.name}</td>
+                            <td>${product.category}</td>
+                            <td>${product.usage_type}</td>
+                            <td>$${product.sell_price}</td>
+                            <td>${product.stock}</td>
+                            <td>${imageDisplay}</td>
+                            <td>${product.supplier_name || ''}</td>
+                            <td>
+                                <button class="editBtn" data-id="${product.id}">Edit</button>
+                                <button class="deleteBtn" data-id="${product.id}">Delete</button>
+                            </td>
+                        </tr>`;
                 });
-            });
-        },
-        error: function (err) {
-            console.error('Error loading products:', err);
-            alert('Failed to load products');
-        }
-    });
-}
-    // Handle form submission
+                $('#productTable tbody').html(rows);
+            },
+            error: function (err) {
+                console.error('Error loading products:', err);
+                alert('Failed to load products');
+            }
+        });
+    }
+
+    // Handle form submission (add / update)
     $('#productForm').submit(function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const productId = $('#productId').val();
         const isEdit = !!productId;
 
-        // Log form data for debugging
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
@@ -122,12 +107,13 @@ function loadProducts() {
             processData: false,
             contentType: false,
             headers: { 'Authorization': `Bearer ${token}` },
-            success: function (response) {
+            success: function () {
                 alert(isEdit ? 'Product updated successfully!' : 'Product added successfully!');
                 $('#productForm')[0].reset();
                 $('#productId').val('');
                 $('#submitBtn').text('Add Product');
                 loadProducts();
+                loadSuppliers();
             },
             error: function (err) {
                 console.error('Error:', err);
@@ -151,7 +137,6 @@ function loadProducts() {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function (product) {
-                // Fill form with product data
                 $('#productId').val(product.id);
                 $('#name').val(product.name);
                 $('#category').val(product.category);
@@ -161,13 +146,9 @@ function loadProducts() {
                 $('#sell_price').val(product.sell_price);
                 $('#color').val(product.color);
                 $('#stock').val(product.stock);
-                $('#supplier_id').val(product.supplier_id);
+                loadSuppliers(product.supplier_id);
                 $('#submitBtn').text('Update Product');
-                
-                // Scroll to form
-                $('html, body').animate({
-                    scrollTop: $('#productForm').offset().top
-                }, 500);
+                $('html, body').animate({ scrollTop: $('#productForm').offset().top }, 500);
             },
             error: function (err) {
                 console.error('Error loading product:', err);
@@ -179,7 +160,6 @@ function loadProducts() {
     // Delete product
     $(document).on('click', '.deleteBtn', function () {
         if (!confirm('Are you sure you want to delete this product?')) return;
-        
         const productId = $(this).data('id');
         $.ajax({
             url: `${productApi}/${productId}`,

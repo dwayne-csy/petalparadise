@@ -12,6 +12,39 @@
   <button id="logoutBtn">Logout</button>
   <button id="viewCartBtn">My Cart</button>
 
+  <h3>Filter & Sort</h3>
+  <div id="filters">
+    <input type="text" id="searchInput" placeholder="Search by name">
+
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="Solo">Solo</option>
+      <option value="By Three">By Three</option>
+      <option value="Bouquet">Bouquet</option>
+    </select>
+
+    <select id="usageTypeFilter">
+      <option value="">All Usage</option>
+      <option value="Decoration">Decoration</option>
+      <option value="Gift">Gift</option>
+      <option value="Event">Event</option>
+    </select>
+
+    <select id="priceSort">
+      <option value="">Sort by price</option>
+      <option value="asc">Price: Low to High</option>
+      <option value="desc">Price: High to Low</option>
+    </select>
+
+    <select id="stockSort">
+      <option value="">Sort by stock</option>
+      <option value="high">High to Low</option>
+      <option value="low">Low to High</option>
+    </select>
+
+    <button id="applyFiltersBtn">Apply Filters</button>
+  </div>
+
   <h2>Products</h2>
   <table border="1" id="productTable">
     <thead>
@@ -23,12 +56,10 @@
         <th>Price</th>
         <th>Stock</th>
         <th>Image</th>
-        <th>Action</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-
-  <button id="checkoutSoloBtn">Checkout Solo Products</button>
 </body>
 </html>

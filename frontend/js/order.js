@@ -53,7 +53,6 @@ $(document).ready(function () {
                                 </select>
                             </td>
                             <td>${order.shipping_address || '-'}</td>
-                            <td>${order.payment_method || '-'}</td>
                             <td>$${order.total_amount || 0}</td>
                             <td>
                                 <button class="acceptBtn" data-id="${order.id}">Accept</button>

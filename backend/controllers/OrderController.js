@@ -54,7 +54,7 @@ exports.updateOrderStatus = (req, res) => {
 
         // Get user email & info
         db.query(
-            `SELECT u.email, u.name, o.id, o.created_at, o.payment_method, o.shipping_address 
+            `SELECT u.email, u.name, o.id, o.created_at, o.shipping_address 
              FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?`,
             [orderId],
             async (err2, users) => {
@@ -125,31 +125,83 @@ exports.updateOrderStatus = (req, res) => {
 // ✅ Helper: generate PDF with product names & total
 async function generatePdfReceipt(order, items, totalAmount, filePath) {
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument();
+        const doc = new PDFDocument({ margin: 50 });
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
 
-        doc.fontSize(18).text('Order Receipt', { align: 'center' }).moveDown();
-        doc.fontSize(12).text(`Order ID: ${order.id}`);
-        doc.text(`Customer Name: ${order.name}`);
-        doc.text(`Order Date: ${order.created_at}`);
-        doc.text(`Payment Method: ${order.payment_method}`);
-        doc.text(`Shipping Address: ${order.shipping_address}`);
-        doc.moveDown();
+        // Header
+        doc
+            .fillColor('#d6336c') // flower pink
+            .fontSize(26)
+            .text('🌸 Petal Paradise Receipt 🌸', { align: 'center' })
+            .moveDown();
 
-        doc.fontSize(14).text('Products:', { underline: true });
+        doc
+            .strokeColor('#e6a1b0')
+            .lineWidth(2)
+            .moveTo(50, doc.y)
+            .lineTo(550, doc.y)
+            .stroke()
+            .moveDown(1);
+
+        // Order details
+        doc
+            .fillColor('#333') // dark text
+            .fontSize(12)
+            .text(`Order ID: ${order.id}`)
+            .text(`Customer Name: ${order.name}`)
+            .text(`Order Date: ${new Date(order.created_at).toLocaleString()}`)
+            .text(`Shipping Address: ${order.shipping_address}`)
+            .moveDown();
+
+        // Products header
+        doc
+            .fillColor('#d6336c')
+            .fontSize(16)
+            .text('🌼 Products', { underline: true })
+            .moveDown(0.5);
+
+        // Product list
         items.forEach((item, index) => {
-            doc.fontSize(12).text(
-                `${index + 1}. ${item.name} - Qty: ${item.quantity} - Price: $${item.price}`
-            );
+            doc
+                .fillColor('#000')
+                .fontSize(12)
+                .text(
+                    `${index + 1}. ${item.name} — Qty: ${item.quantity} — Price: $${item.price}`
+                );
         });
 
-        doc.moveDown();
-        doc.fontSize(12).text(`Total Amount: $${totalAmount.toFixed(2)}`);
-        doc.moveDown();
-        doc.text('Thank you for shopping with us!');
+        doc.moveDown(1);
+
+        // Total
+        doc
+            .strokeColor('#e6a1b0')
+            .lineWidth(1)
+            .moveTo(50, doc.y)
+            .lineTo(550, doc.y)
+            .stroke()
+            .moveDown(0.5);
+
+        doc
+            .fillColor('#000')
+            .fontSize(14)
+            .text(`Total Amount: $${totalAmount.toFixed(2)}`, { align: 'right' })
+            .moveDown(1);
+
+        // Footer / thank you note
+        doc
+            .fillColor('#d6336c')
+            .fontSize(12)
+            .text('Thank you for making your day bloom with Petal Paradise! 🌷', { align: 'center' })
+            .moveDown(0.5);
+
+        doc
+            .fontSize(10)
+            .fillColor('#888')
+            .text('www.petalparadise.com • @PetalParadiseShop', { align: 'center' });
 
         doc.end();
+
         stream.on('finish', resolve);
         stream.on('error', reject);
     });

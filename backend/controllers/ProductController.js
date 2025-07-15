@@ -45,7 +45,12 @@ exports.createProduct = (req, res) => {
 };
 
 exports.getProducts = (req, res) => {
-    connection.query('SELECT * FROM products', (err, results) => {
+    const sql = `
+        SELECT p.*, s.supplier_name 
+        FROM products p 
+        LEFT JOIN supplier s ON p.supplier_id = s.id
+    `;
+    connection.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(results);
     });
