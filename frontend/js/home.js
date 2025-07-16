@@ -110,4 +110,7 @@ $(document).ready(function () {
     $('#applyFiltersBtn').click(loadProducts);
     $("#logoutBtn").click(() => { sessionStorage.clear(); window.location.href = "/frontend/Userhandling/login.html"; });
     $("#viewCartBtn").click(() => window.location.href = "/frontend/Userhandling/cart.html");
+
+    // ✅ Added edit profile button click handler here
+    $("#editProfileBtn").click(() => window.location.href = "/frontend/Userhandling/profile.html");
 });

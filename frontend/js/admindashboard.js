@@ -26,3 +26,19 @@ $(document).ready(function () {
         }
     });
 });
+
+$.ajax({
+    method: "GET",
+    url: "http://localhost:4000/api/v1/admindashboard",
+    headers: { 'Authorization': `Bearer ${token}` },
+    success: function (res) {
+        const stats = res.stats;
+        $("#statUsers").text(stats.customers);
+        $("#statProducts").text(stats.products);
+        $("#statOrders").text(stats.orders);
+        $("#statReviews").text(stats.reviews);
+    },
+    error: function () {
+        Swal.fire("Error", "Failed to load dashboard stats", "error");
+    }
+});

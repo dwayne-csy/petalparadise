@@ -1,29 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Product Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- Admin-only access check -->
-  <script>
-    $(document).ready(function () {
-      const token = sessionStorage.getItem('token');
-      const userId = sessionStorage.getItem('userId');
-      const role = sessionStorage.getItem('role');
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+      padding: 20px;
+      overflow-x: hidden;
+    }
 
-      if (!token || !userId || role !== 'admin') {
-        sessionStorage.clear();
-        return window.location.href = "/frontend/Userhandling/login.html";
+    h2 {
+      text-align: center;
+      color: #ad1457;
+    }
+
+    #backBtn {
+      background-color: #ec407a;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-bottom: 20px;
+    }
+
+    #backBtn:hover {
+      background-color: #d81b60;
+    }
+
+    #productForm {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      margin: 0 auto 30px;
+      display: grid;
+      gap: 15px;
+    }
+
+    #productForm input,
+    #productForm select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    #submitBtn {
+      background-color: #ec407a;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #submitBtn:hover {
+      background-color: #d81b60;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f8bbd0;
+      color: #6a1b9a;
+    }
+
+    td button {
+      background-color: #f48fb1;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0 3px;
+    }
+
+    td button:hover {
+      background-color: #ec407a;
+    }
+
+    .slider-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .slider-btn {
+      background-color: #ec407a;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .slider-btn:hover {
+      background-color: #d81b60;
+    }
+
+    .image-slider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .petal {
+      position: fixed;
+      top: -50px;
+      width: 25px;
+      height: 25px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/742/742751.png');
+      background-size: cover;
+      animation: fall linear infinite;
+      z-index: 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
       }
-
-      console.log(`Welcome Admin (ID: ${userId})`);
-    });
-  </script>
-
-  <script src="/frontend/js/product.js" defer></script>
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <script>
+    for (let i = 0; i < 20; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.animationDuration = (5 + Math.random() * 5) + 's';
+      petal.style.animationDelay = (Math.random() * 5) + 's';
+      document.body.appendChild(petal);
+    }
+  </script>
+
+  <button id="backBtn">« Back to Dashboard</button>
   <h2>Product Management</h2>
 
   <form id="productForm" enctype="multipart/form-data">
@@ -47,12 +198,12 @@
     </select>
 
     <input type="text" id="description" name="description" placeholder="Description">
-    <input type="number" step="0.01" id="cost_price" name="cost_price" placeholder="Cost Price" required>
-    <input type="number" step="0.01" id="sell_price" name="sell_price" placeholder="Sell Price" required>
+    <input type="number" step="1" id="cost_price" name="cost_price" placeholder="Cost Price" required>
+    <input type="number" step="1" id="sell_price" name="sell_price" placeholder="Sell Price" required>
     <input type="text" id="color" name="color" placeholder="Color">
     <input type="number" id="stock" name="stock" placeholder="Stock">
     <input type="file" id="images" name="images" accept="image/*" multiple>
-    
+
     <select id="supplier_id" name="supplier_id">
       <option value="">-- Supplier (Optional) --</option>
     </select>
@@ -60,9 +211,9 @@
     <button type="submit" id="submitBtn">Add Product</button>
   </form>
 
-  <hr>
+  <br>
 
-  <table border="1" id="productTable">
+  <table id="productTable">
     <thead>
       <tr>
         <th>#</th>
@@ -78,5 +229,24 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <script>
+    $(document).ready(function () {
+      const token = sessionStorage.getItem('token');
+      const userId = sessionStorage.getItem('userId');
+      const role = sessionStorage.getItem('role');
+
+      if (!token || !userId || role !== 'admin') {
+        sessionStorage.clear();
+        return window.location.href = "/frontend/Userhandling/login.html";
+      }
+
+      $("#backBtn").click(() => {
+        window.location.href = "/frontend/Adminhandling/admindashboard.html";
+      });
+    });
+  </script>
+
+  <script src="/frontend/js/product.js" defer></script>
 </body>
 </html>

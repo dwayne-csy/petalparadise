@@ -20,7 +20,6 @@ $(document).ready(function () {
                 return window.location.href = "/frontend/Userhandling/home.html";
             }
 
-            // ✅ User is admin → load users
             loadUsers();
         },
         error: function () {
@@ -83,6 +82,7 @@ $(document).ready(function () {
                 $('#userForm')[0].reset();
                 $('#submitBtn').text('Update');
                 $('#userId').val('');
+                $('#editingUserName').text(''); // ✅ Clear name after update
                 loadUsers();
             },
             error: err => alert(err.responseJSON?.error || 'Error occurred.')
@@ -102,6 +102,9 @@ $(document).ready(function () {
                 $('#role').val(u.role);
                 $('#status').val(u.status);
                 $('#submitBtn').text('Update');
+
+                // ✅ Show user name on top of form
+                $('#editingUserName').text(`Editing: ${u.name}`);
             },
             error: function () {
                 alert('Failed to load user details');

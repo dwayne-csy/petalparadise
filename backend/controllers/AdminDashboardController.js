@@ -5,7 +5,13 @@ const getAdminDashboard = (req, res) => {
         return res.status(403).json({ error: "Access denied. Admins only." });
     }
 
-
+    const sql = `
+        SELECT 
+            (SELECT COUNT(*) FROM users WHERE role = 'customer') AS customers,
+            (SELECT COUNT(*) FROM products) AS products,
+            (SELECT COUNT(*) FROM orders) AS orders,
+            (SELECT COUNT(*) FROM reviews) AS reviews;
+    `;
 
     connection.query(sql, (err, results) => {
         if (err) {

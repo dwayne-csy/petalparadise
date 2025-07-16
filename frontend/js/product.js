@@ -4,14 +4,13 @@ $(document).ready(function () {
     const productApi = 'http://localhost:4000/api/v1/product';
     const supplierApi = 'http://localhost:4000/api/v1/supplier';
 
-    // Check authentication
     if (!token || !userId) {
         sessionStorage.clear();
         window.location.href = "/frontend/Userhandling/login.html";
         return;
     }
 
-    // Check admin status and load data
+    // Auth check + data load
     $.ajax({
         method: "GET",
         url: `http://localhost:4000/api/v1/profile/${userId}`,
@@ -52,7 +51,7 @@ $(document).ready(function () {
 
     function loadProducts() {
         $.ajax({
-            url: productApi,   // ✅ use productApi instead of /home
+            url: productApi,
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function (data) {
@@ -60,8 +59,14 @@ $(document).ready(function () {
                 data.forEach((product, index) => {
                     let imageDisplay = '';
                     if (product.image) {
-                        const firstImage = product.image.split(',')[0];
-                        imageDisplay = `<img src="/frontend/images/${firstImage}" width="50" height="50">`;
+                        const imageArray = product.image.split(',');
+                        const firstImage = imageArray[0];
+                        imageDisplay = `
+                          <div class="image-slider" data-index="0" data-images='${JSON.stringify(imageArray)}'>
+                            <button class="slider-btn prev-btn">&lt;</button>
+                            <img src="/frontend/images/${firstImage}" class="slider-img">
+                            <button class="slider-btn next-btn">&gt;</button>
+                          </div>`;
                     }
 
                     rows += `
@@ -89,16 +94,11 @@ $(document).ready(function () {
         });
     }
 
-    // Handle form submission (add / update)
     $('#productForm').submit(function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const productId = $('#productId').val();
         const isEdit = !!productId;
-
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
 
         $.ajax({
             url: isEdit ? `${productApi}/${productId}` : productApi,
@@ -129,7 +129,6 @@ $(document).ready(function () {
         });
     });
 
-    // Edit product
     $(document).on('click', '.editBtn', function () {
         const productId = $(this).data('id');
         $.ajax({
@@ -157,7 +156,6 @@ $(document).ready(function () {
         });
     });
 
-    // Delete product
     $(document).on('click', '.deleteBtn', function () {
         if (!confirm('Are you sure you want to delete this product?')) return;
         const productId = $(this).data('id');
@@ -174,5 +172,21 @@ $(document).ready(function () {
                 alert('Failed to delete product');
             }
         });
+    });
+
+    // Image slider navigation
+    $(document).on('click', '.next-btn, .prev-btn', function () {
+        const $slider = $(this).closest('.image-slider');
+        const images = JSON.parse($slider.attr('data-images'));
+        let index = parseInt($slider.attr('data-index'));
+
+        if ($(this).hasClass('next-btn')) {
+            index = (index + 1) % images.length;
+        } else {
+            index = (index - 1 + images.length) % images.length;
+        }
+
+        $slider.find('img').attr('src', `/frontend/images/${images[index]}`);
+        $slider.attr('data-index', index);
     });
 });

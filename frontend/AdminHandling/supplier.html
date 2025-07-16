@@ -1,30 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Supplier Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
-  <!-- ✅ Add this before loading supplier.js -->
-  <script>
-    $(document).ready(function () {
-      const token = sessionStorage.getItem('token');
-      const userId = sessionStorage.getItem('userId');
-      const role = sessionStorage.getItem('role');
 
-      if (!token || !userId || role !== 'admin') {
-        sessionStorage.clear();
-        return window.location.href = "/frontend/Userhandling/login.html";
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ad1457;
+      margin-bottom: 20px;
+    }
+
+    #backBtn {
+      display: inline-block;
+      background-color: #ec407a;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #backBtn:hover {
+      background-color: #d81b60;
+    }
+
+    #supplierForm {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto 30px;
+      display: grid;
+      gap: 15px;
+    }
+
+    #supplierForm input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    #submitBtn {
+      background-color: #ec407a;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #submitBtn:hover {
+      background-color: #d81b60;
+    }
+
+    #supplierTable {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #supplierTable th, #supplierTable td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    #supplierTable th {
+      background-color: #f8bbd0;
+      color: #6a1b9a;
+    }
+
+    #supplierTable td:last-child button {
+      margin: 0 5px;
+      background-color: #f48fb1;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #supplierTable td:last-child button:hover {
+      background-color: #ec407a;
+    }
+
+    /* 🌸 Petal Animation */
+    .petal {
+      position: fixed;
+      top: -50px;
+      width: 25px;
+      height: 25px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/742/742751.png');
+      background-size: cover;
+      animation: fall linear infinite;
+      z-index: 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
       }
-
-      // Optional: show admin ID or name somewhere
-      console.log(`Welcome Admin (ID: ${userId})`);
-    });
-  </script>
-
-  <script src="/frontend/js/supplier.js" defer></script>
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- 🌸 Petals falling -->
+  <script>
+    for (let i = 0; i < 15; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.animationDuration = (5 + Math.random() * 5) + 's';
+      petal.style.animationDelay = (Math.random() * 5) + 's';
+      document.body.appendChild(petal);
+    }
+  </script>
+
+  <!-- 🔙 Back Button -->
+  <div style="text-align: left; margin-bottom: 15px;">
+    <button id="backBtn">« Back to Dashboard</button>
+  </div>
+
   <h2>Supplier Management</h2>
 
   <form id="supplierForm">
@@ -36,9 +167,9 @@
     <button type="submit" id="submitBtn">Add Supplier</button>
   </form>
 
-  <hr>
+  <br>
 
-  <table border="1" id="supplierTable">
+  <table id="supplierTable">
     <thead>
       <tr>
         <th>#</th>
@@ -51,5 +182,25 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <!-- Auth Check + Navigation -->
+  <script>
+    $(document).ready(function () {
+      const token = sessionStorage.getItem('token');
+      const userId = sessionStorage.getItem('userId');
+      const role = sessionStorage.getItem('role');
+
+      if (!token || !userId || role !== 'admin') {
+        sessionStorage.clear();
+        return window.location.href = "/frontend/Userhandling/login.html";
+      }
+
+      $("#backBtn").click(() => {
+        window.location.href = "/frontend/Adminhandling/admindashboard.html";
+      });
+    });
+  </script>
+
+  <script src="/frontend/js/supplier.js" defer></script>
 </body>
 </html>
