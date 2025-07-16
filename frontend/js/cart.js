@@ -23,15 +23,20 @@ $(document).ready(function () {
                 cart.forEach((item, index) => {
                     total += Number(item.sell_price) * item.quantity;
 
-                    const image = item.image 
-                        ? `<img src="/frontend/images/${item.image.split(',')[0]}" width="50" height="50">`
-                        : '';
+                    const images = item.image ? item.image.split(',') : [];
+                    const imageHtml = images.length > 0 ? `
+                        <div class="image-slider" data-index="0" data-images='${JSON.stringify(images)}'>
+                            ${images.length > 1 ? `<button class="img-nav-btn left">&lt;</button>` : ''}
+                            <img class="cart-img" src="/frontend/images/${images[0]}" />
+                            ${images.length > 1 ? `<button class="img-nav-btn right">&gt;</button>` : ''}
+                        </div>
+                    ` : '';
 
                     rows += `
                         <tr>
                             <td>${index + 1}</td>
                             <td>${item.name}</td>
-                            <td>${image}</td>
+                            <td>${imageHtml}</td>
                             <td>$${item.sell_price}</td>
                             <td>${item.quantity}</td>
                             <td>
@@ -56,7 +61,6 @@ $(document).ready(function () {
 
     loadCart();
 
-    // ➕ Increment quantity
     $(document).on('click', '.incrementBtn', function () {
         const cartItemId = $(this).data('id');
         $.ajax({
@@ -70,7 +74,6 @@ $(document).ready(function () {
         });
     });
 
-    // ➖ Decrement quantity
     $(document).on('click', '.decrementBtn', function () {
         const cartItemId = $(this).data('id');
         $.ajax({
@@ -84,7 +87,6 @@ $(document).ready(function () {
         });
     });
 
-    // 🗑 Remove from cart
     $(document).on('click', '.removeBtn', function () {
         const cartItemId = $(this).data('id');
         $.ajax({
@@ -98,7 +100,6 @@ $(document).ready(function () {
         });
     });
 
-    // ✅ Proceed to checkout
     $('#checkoutBtn').on('click', function () {
         $.ajax({
             url: 'http://localhost:4000/api/v1/checkout/cart',
@@ -114,8 +115,24 @@ $(document).ready(function () {
             }
         });
     });
-});
 
-$('#backToHomeBtn').on('click', function () {
-    window.location.href = "/frontend/Userhandling/home.html";
+    $('#backToHomeBtn').on('click', function () {
+        window.location.href = "/frontend/Userhandling/home.html";
+    });
+
+    // 👈 👉 Image navigation
+    $(document).on('click', '.img-nav-btn', function () {
+        const slider = $(this).closest('.image-slider');
+        const images = JSON.parse(slider.attr('data-images'));
+        let index = parseInt(slider.attr('data-index'));
+
+        if ($(this).hasClass('left')) {
+            index = (index - 1 + images.length) % images.length;
+        } else {
+            index = (index + 1) % images.length;
+        }
+
+        slider.attr('data-index', index);
+        slider.find('img').attr('src', `/frontend/images/${images[index]}`);
+    });
 });

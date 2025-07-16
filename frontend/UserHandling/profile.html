@@ -1,23 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Update Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #backBtn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #ec407a;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    #backBtn:hover {
+      background-color: #c2185b;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ad1457;
+      margin-top: 60px;
+      margin-bottom: 20px;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    #avatarPreview {
+      display: block;
+      margin: 10px auto;
+      max-width: 120px;
+      border-radius: 50%;
+      border: 3px solid #f48fb1;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #ec407a;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #d81b60;
+    }
+
+    /* 🌸 Petal Animation */
+    .petal {
+      position: fixed;
+      top: -50px;
+      width: 25px;
+      height: 25px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/742/742751.png');
+      background-size: cover;
+      animation: fall linear infinite;
+      z-index: 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- 🌸 Petals Falling -->
+  <script>
+    for (let i = 0; i < 15; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.animationDuration = (5 + Math.random() * 5) + 's';
+      petal.style.animationDelay = (Math.random() * 5) + 's';
+      document.body.appendChild(petal);
+    }
+  </script>
+
+  <!-- 🔙 Back Button -->
+  <a id="backBtn" href="/frontend/Userhandling/home.html">« Back to Home</a>
+
   <h2>Update Profile</h2>
+
   <form id="profileForm" enctype="multipart/form-data">
-    <input type="text" name="name" id="fullName" placeholder="Full Name" required><br>
-    <input type="text" name="contact_number" id="phone" placeholder="Contact Number"><br>
-    <input type="text" name="address" id="address" placeholder="Address"><br>
+    <input type="text" name="name" id="fullName" placeholder="Full Name" required />
+    <input type="text" name="contact_number" id="phone" placeholder="Contact Number" />
+    <input type="text" name="address" id="address" placeholder="Address" />
     
-    <input type="file" name="profile_image" id="avatar" accept="image/*">
-    <img id="avatarPreview" style="max-width: 100px;"><br>
+    <input type="file" name="profile_image" id="avatar" accept="image/*" />
+    <img id="avatarPreview" src="#" alt="Preview" style="display:none;" /><br>
 
     <button type="submit" id="updateBtn">Update</button>
   </form>
+
+  <script>
+    $("#avatar").on("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          $("#avatarPreview").attr("src", e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
 
   <script src="/frontend/js/user.js"></script>
 </body>
