@@ -75,7 +75,7 @@ $(document).ready(function () {
                             <td>${product.name}</td>
                             <td>${product.category}</td>
                             <td>${product.usage_type}</td>
-                            <td>$${product.sell_price}</td>
+                            <td>₱${product.sell_price}</td>
                             <td>${product.stock}</td>
                             <td>${imageDisplay}</td>
                             <td>${product.supplier_name || ''}</td>

@@ -1,6 +1,40 @@
 $(document).ready(function () {
     const url = `http://localhost:4000/api/v1/register`;
 
+    // 🔍 FETCH PROFILE DATA ON PAGE LOAD
+    const token = sessionStorage.getItem('token');
+    const userId = sessionStorage.getItem('userId');
+
+    if (token && userId) {
+        // Fetch profile data and populate form
+        $.ajax({
+            method: "GET",
+            url: `http://localhost:4000/api/v1/profile/${userId}`,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            success: function (data) {
+                if (data.user) {
+                    // Populate form fields with existing data
+                    $('#fullName').val(data.user.name || '');
+                    $('#phone').val(data.user.contact_number || '');
+                    $('#address').val(data.user.address || '');
+                    
+                    // Handle profile image if exists
+                    if (data.user.profile_image) {
+                        $('#avatarPreview').attr('src', `http://localhost:4000/${data.user.profile_image}`).show();
+                        $('.upload-placeholder').hide();
+                        $('.avatar-upload-area').addClass('has-image');
+                    }
+                }
+            },
+            error: function () {
+                sessionStorage.clear();
+                window.location.href = "/frontend/Userhandling/login.html";
+            }
+        });
+    }
+
     // 📌 REGISTER USER
     $("#register").on('click', function (e) {
         e.preventDefault();
@@ -167,32 +201,6 @@ $("#login").on('click', function (e) {
                     position: 'bottom-right'
                 });
             }
-        });
-
-        // 🔍 FETCH PROFILE
-        $(document).ready(function () {
-            const token = sessionStorage.getItem('token');
-            const userId = sessionStorage.getItem('userId');
-
-            if (!token || !userId) {
-                return window.location.href = '/frontend/Userhandling/login.html';
-            }
-
-            // Fetch profile
-            $.ajax({
-                method: "GET",
-                url: `http://localhost:4000/api/v1/profile/${userId}`,
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function (data) {
-                    // Populate form fields or do role checking
-                },
-                error: function () {
-                    sessionStorage.clear();
-                    window.location.href = "/frontend/Userhandling/login.html";
-                }
-            });
         });
     });
 });

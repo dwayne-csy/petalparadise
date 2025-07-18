@@ -5,30 +5,47 @@
   <title>Supplier Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdn.datatables.net/buttons/2.3.5/css/buttons.dataTables.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-buttons-bs5/2.3.6/buttons.bootstrap5.min.css" integrity="sha512-vWTrt2A9iAn2pK8hNZS26YZRDDUvLrLOOMm+pcrUJFzGssUwoS6Gofp+TT2deQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
+  
+  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
+  <!-- DataTables JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.bootstrap4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.5/js/buttons.html5.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(to right, #fce4ec, #f8bbd0);
       padding: 20px;
-      position: relative;
       overflow-x: hidden;
     }
 
     h2 {
       text-align: center;
       color: #ad1457;
-      margin-bottom: 20px;
     }
 
     #backBtn {
-      display: inline-block;
       background-color: #ec407a;
       color: white;
       padding: 8px 15px;
@@ -37,10 +54,60 @@
       font-weight: 500;
       cursor: pointer;
       transition: background 0.3s;
+      margin-bottom: 20px;
     }
 
     #backBtn:hover {
       background-color: #d81b60;
+    }
+
+    /* New styling for show/hide form buttons */
+    .form-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #showFormBtn, #hideFormBtn {
+      background-color: #ec407a;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-size: 14px;
+    }
+
+    #showFormBtn:hover, #hideFormBtn:hover {
+      background-color: #d81b60;
+    }
+
+    #hideFormBtn {
+      background-color: #f44336;
+    }
+
+    #hideFormBtn:hover {
+      background-color: #d32f2f;
+    }
+
+    /* Form container styling */
+    #formContainer {
+      display: none; /* Hidden by default */
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     #supplierForm {
@@ -52,6 +119,7 @@
       margin: 0 auto 30px;
       display: grid;
       gap: 15px;
+      position: relative;
     }
 
     #supplierForm input {
@@ -76,7 +144,25 @@
       background-color: #d81b60;
     }
 
-    #supplierTable {
+    /* Close button in form */
+    .close-form-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #ec407a;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .close-form-btn:hover {
+      color: #d81b60;
+    }
+
+    table {
       width: 100%;
       border-collapse: collapse;
       background-color: #fff;
@@ -85,19 +171,18 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
-    #supplierTable th, #supplierTable td {
+    th, td {
       padding: 12px;
       text-align: center;
       border-bottom: 1px solid #eee;
     }
 
-    #supplierTable th {
+    th {
       background-color: #f8bbd0;
       color: #6a1b9a;
     }
 
-    #supplierTable td:last-child button {
-      margin: 0 5px;
+    td button {
       background-color: #f48fb1;
       border: none;
       color: white;
@@ -105,19 +190,19 @@
       border-radius: 10px;
       cursor: pointer;
       font-size: 14px;
+      margin: 0 3px;
     }
 
-    #supplierTable td:last-child button:hover {
+    td button:hover {
       background-color: #ec407a;
     }
 
-    /* 🌸 Petal Animation */
     .petal {
       position: fixed;
       top: -50px;
       width: 25px;
       height: 25px;
-      background-image: url('https://cdn-icons-png.flaticon.com/512/742/742751.png');
+      background-image: url('https://emojigraph.org/media/apple/rose_1f339.png');
       background-size: cover;
       animation: fall linear infinite;
       z-index: 0;
@@ -135,13 +220,59 @@
         opacity: 0;
       }
     }
+
+    /* DataTables custom styling to match your theme */
+    .dataTables_wrapper .dataTables_filter input {
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      border-radius: 10px !important;
+      margin: 0 2px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background-color: #ec407a !important;
+      border-color: #ec407a !important;
+      color: white !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background-color: #f48fb1 !important;
+      border-color: #f48fb1 !important;
+      color: white !important;
+    }
+
+    .dt-buttons {
+      margin-bottom: 15px;
+    }
+
+    .dt-buttons .btn {
+      background-color: #ec407a;
+      border-color: #ec407a;
+      color: white;
+      border-radius: 10px;
+      margin-right: 5px;
+    }
+
+    .dt-buttons .btn:hover {
+      background-color: #d81b60;
+      border-color: #d81b60;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 🌸 Petals falling -->
   <script>
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       const petal = document.createElement('div');
       petal.className = 'petal';
       petal.style.left = Math.random() * 100 + 'vw';
@@ -151,39 +282,45 @@
     }
   </script>
 
-  <!-- 🔙 Back Button -->
-  <div style="text-align: left; margin-bottom: 15px;">
-    <button id="backBtn">« Back to Dashboard</button>
-  </div>
-
+  <button id="backBtn">« Back to Dashboard</button>
   <h2>Supplier Management</h2>
 
-  <form id="supplierForm">
-    <input type="hidden" id="supplierId">
-    <input type="text" id="supplier_name" placeholder="Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="text" id="phone" placeholder="Phone">
-    <input type="text" id="address" placeholder="Address">
-    <button type="submit" id="submitBtn">Add Supplier</button>
-  </form>
+  <!-- Form control buttons -->
+  <div class="form-controls">
+    <button id="showFormBtn">➕ Add New Supplier</button>
+  </div>
+
+  <!-- Form container (hidden by default) -->
+  <div id="formContainer">
+    <form id="supplierForm">
+      <button type="button" class="close-form-btn" id="closeFormBtn">×</button>
+      <input type="hidden" id="supplierId">
+      <input type="text" id="supplier_name" name="supplier_name" placeholder="Supplier Name" required>
+      <input type="email" id="email" name="email" placeholder="Email" required>
+      <input type="text" id="phone" name="phone" placeholder="Phone">
+      <input type="text" id="address" name="address" placeholder="Address">
+      <button type="submit" id="submitBtn">Add Supplier</button>
+    </form>
+  </div>
 
   <br>
 
-  <table id="supplierTable">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Address</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-responsive">
+    <table id="supplierTable" class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-  <!-- Auth Check + Navigation -->
   <script>
     $(document).ready(function () {
       const token = sessionStorage.getItem('token');
@@ -197,6 +334,64 @@
 
       $("#backBtn").click(() => {
         window.location.href = "/frontend/Adminhandling/admindashboard.html";
+      });
+
+      // Form show/hide functionality
+      $("#showFormBtn").click(function() {
+        $("#formContainer").show();
+        $("#showFormBtn").hide();
+        // Reset form when showing
+        $("#supplierForm")[0].reset();
+        $("#supplierId").val('');
+        $("#submitBtn").text('Add Supplier');
+      });
+
+      $("#closeFormBtn").click(function() {
+        $("#formContainer").hide();
+        $("#showFormBtn").show();
+      });
+
+      // Also add functionality to hide form when clicking outside (optional)
+      $(document).click(function(event) {
+        if (!$(event.target).closest('#formContainer, #showFormBtn').length) {
+          if ($("#formContainer").is(':visible')) {
+            $("#formContainer").hide();
+            $("#showFormBtn").show();
+          }
+        }
+      });
+
+      // Initialize DataTables
+      $('#supplierTable').DataTable({
+        "responsive": true,
+        "processing": true,
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "order": [[0, "desc"]],
+        "columnDefs": [
+          {
+            "targets": [5], // Actions column
+            "orderable": false,
+            "searchable": false
+          }
+        ],
+        "language": {
+          "search": "Search suppliers:",
+          "lengthMenu": "Show _MENU_ suppliers per page",
+          "info": "Showing _START_ to _END_ of _TOTAL_ suppliers",
+          "infoEmpty": "No suppliers found",
+          "infoFiltered": "(filtered from _MAX_ total suppliers)",
+          "paginate": {
+            "first": "First",
+            "last": "Last",
+            "next": "Next",
+            "previous": "Previous"
+          }
+        },
+        "dom": 'Bfrtip',
+        "buttons": [
+          'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
       });
     });
   </script>

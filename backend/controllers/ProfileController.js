@@ -51,7 +51,7 @@ const updateUser = (req, res) => {
 const getProfile = (req, res) => {
     const userId = req.params.id;
 
-    const sql = 'SELECT id, name, email, role FROM users WHERE id = ? AND deleted_at IS NULL';
+    const sql = 'SELECT id, name, email, role, contact_number, address, profile_image FROM users WHERE id = ? AND deleted_at IS NULL';
     connection.execute(sql, [userId], (err, results) => {
         if (err) return res.status(500).json({ error: 'Database error' });
         if (results.length === 0) return res.status(404).json({ error: 'User not found' });

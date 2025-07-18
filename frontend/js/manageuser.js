@@ -89,7 +89,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('click', '.editBtn', function () {
+        $(document).on('click', '.editBtn', function () {
         const id = $(this).data('id');
         $.ajax({
             url: `${apiUrl}/${id}`,
@@ -105,6 +105,9 @@ $(document).ready(function () {
 
                 // ✅ Show user name on top of form
                 $('#editingUserName').text(`Editing: ${u.name}`);
+                
+                // ✅ ADD THIS LINE TO SHOW THE FORM
+                $('#formContainer').show();
             },
             error: function () {
                 alert('Failed to load user details');
