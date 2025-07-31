@@ -1,6 +1,7 @@
 $(document).ready(function() {
     const token = sessionStorage.getItem('token');
-    let barChart, pieChart, lineChart;
+    let barChart, pieChart, lineChart, loyalChart;
+    
 
     if (!token) return window.location.href = "/frontend/Userhandling/login.html";
 
@@ -30,13 +31,15 @@ $(document).ready(function() {
 
     // Function to load all charts
     function loadCharts(month = 'all', year = '2025') {
-        // First hide all charts and show loading state
+        // Show loading
         toggleNoData('pie', true);
         toggleNoData('bar', true);
         toggleNoData('line', true);
+        toggleNoData('loyal', true);
         $('#pieNoData').text('Loading...');
         $('#barNoData').text('Loading...');
         $('#lineNoData').text('Loading...');
+        $('#loyalNoData').text('Loading...');
 
         // Pie chart: Most sold products
         $.ajax({
@@ -77,9 +80,7 @@ $(document).ready(function() {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                position: 'right'
-                            }
+                            legend: { position: 'right' }
                         }
                     }
                 });
@@ -112,10 +113,10 @@ $(document).ready(function() {
                 }
 
                 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                 const labels = filteredData.map(d => {
-                    const [year, monthNum] = d.month.split('-');
-                    return monthNames[parseInt(monthNum) - 1] + ' ' + year;
+                    const [yearStr, monthNum] = d.month.split('-');
+                    return monthNames[parseInt(monthNum) - 1] + ' ' + yearStr;
                 });
                 const values = filteredData.map(d => d.total_sales);
                 
@@ -135,11 +136,7 @@ $(document).ready(function() {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
             },
@@ -184,11 +181,7 @@ $(document).ready(function() {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
             },
@@ -197,9 +190,39 @@ $(document).ready(function() {
                 $('#lineNoData').text('Error Loading Data');
             }
         });
+
+        // Loyal customers chart
+$('#loyalCustomersList').html('<p class="loading-text">Loading loyal customers...</p>');
+
+$.ajax({
+    url: `http://localhost:4000/api/v1/charts/most-loyal-customers?year=${year}${month !== 'all' ? `&month=${month}` : ''}`,
+    headers: { 'Authorization': `Bearer ${token}` },
+    success: data => {
+        const hasData = data && data.length > 0 && data.some(d => d.total_items_purchased > 0);
+
+        if (!hasData) {
+            $('#loyalCustomersList').html('<p class="no-data-text">No Loyal Customers Found</p>');
+            return;
+        }
+
+        const cardsHtml = data.map(d => `
+            <div class="loyal-card">
+                <div style="font-size: 18px; font-weight: 600;">${d.name}</div>
+                <div style="margin-top: 5px; font-size: 14px;">Purchased Items: ${d.total_items_purchased}</div>
+            </div>
+        `).join('');
+
+        $('#loyalCustomersList').html(cardsHtml);
+    },
+    error: () => {
+        $('#loyalCustomersList').html('<p class="no-data-text">Error Loading Loyal Customers</p>');
+    }
+});
+
+
     }
 
-    // Initial load of all charts
+    // Initial load
     loadCharts();
 
     // Filter change events
@@ -208,4 +231,8 @@ $(document).ready(function() {
         const year = $('#yearFilter').val();
         loadCharts(month, year);
     });
+
+
+
+
 });

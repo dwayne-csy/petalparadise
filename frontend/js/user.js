@@ -1,5 +1,6 @@
 $(document).ready(function () {
     const url = `http://localhost:4000/api/v1/register`;
+    
 
     // 🔍 FETCH PROFILE DATA ON PAGE LOAD
     const token = sessionStorage.getItem('token');

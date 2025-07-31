@@ -1,5 +1,6 @@
 const db = require('../config/db');
 
+
 // Pie chart: Most sold products (with month/year filter)
 exports.getMostSoldProducts = (req, res) => {
     const { year, month } = req.query;
@@ -114,3 +115,45 @@ exports.getMonthlySales = (req, res) => {
         res.json(rows);
     });
 };
+
+
+exports.getMostLoyalCustomers = (req, res) => {
+    const { year, month } = req.query;
+
+    let sql = `
+        SELECT u.id, u.name, u.email, SUM(oi.quantity) AS total_items_purchased
+        FROM order_items oi
+        JOIN orders o ON oi.order_id = o.id
+        JOIN users u ON o.user_id = u.id
+    `;
+
+    const conditions = [];
+    const params = [];
+
+    if (year) {
+        conditions.push('YEAR(o.created_at) = ?');
+        params.push(year);
+    }
+
+    if (month) {
+        conditions.push('MONTH(o.created_at) = ?');
+        params.push(month);
+    }
+
+    if (conditions.length > 0) {
+        sql += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    sql += `
+        GROUP BY u.id
+        ORDER BY total_items_purchased DESC
+        LIMIT 10
+    `;
+
+    db.query(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Error', error: err });
+        res.json(rows);
+    });
+};
+
+

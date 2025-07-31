@@ -7,5 +7,9 @@ const admin = require('../middlewares/admin');
 router.get('/charts/most-sold-products', auth, admin, SalesChartController.getMostSoldProducts);
 router.get('/charts/orders-by-address', auth, admin, SalesChartController.getOrdersByAddress);
 router.get('/charts/monthly-sales', auth, admin, SalesChartController.getMonthlySales);
+router.get('/charts/most-loyal-customers', auth, admin, SalesChartController.getMostLoyalCustomers);
+
+
+
 
 module.exports = router;

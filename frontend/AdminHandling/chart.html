@@ -54,6 +54,24 @@
       margin: 0 auto;
     }
 
+    .chart-filter {
+      margin-bottom: 25px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .chart-filter select {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 1px solid #f8bbd0;
+      background-color: white;
+      color: #ad1457;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      font-size: 16px;
+    }
+
     .chart-row {
       display: flex;
       justify-content: center;
@@ -97,24 +115,52 @@
       height: 100% !important;
     }
 
-    /* Filter styles */
-    .chart-filter {
-      margin-bottom: 25px;
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-    }
-    
-    .chart-filter select {
-      padding: 10px 15px;
-      border-radius: 10px;
-      border: 1px solid #f8bbd0;
-      background-color: white;
-      color: #ad1457;
-      font-family: 'Poppins', sans-serif;
-      outline: none;
-      font-size: 16px;
-    }
+   .loyal-customers-box {
+  background: #fff3e0; /* soft peach highlight */
+  border: 2px solid #ffb74d;
+  border-radius: 25px;
+  padding: 30px;
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto 0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.loyal-customers-box h3 {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+#loyalCustomersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.loyal-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 180px;
+  text-align: center;
+  color: #ad1457;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.loyal-card:hover {
+  transform: translateY(-5px);
+}
+
+.loading-text, .no-data-text {
+  text-align: center;
+  color: #ad1457;
+  font-size: 16px;
+}
 
     /* 🌸 Petal Animation */
     .petal {
@@ -131,14 +177,8 @@
     }
 
     @keyframes fall {
-      0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(110vh) rotate(360deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
@@ -156,12 +196,11 @@
     }
   </script>
 
-  <!-- 🔙 Back Button -->
   <div style="text-align: left;">
     <button id="backBtn">« Back to Dashboard</button>
   </div>
 
-  <h2>Admin Dashboard: Sales Charts</h2>
+  <h2>Sales Charts</h2>
 
   <div class="chart-container">
     <div class="chart-filter">
@@ -182,7 +221,7 @@
       </select>
       <select id="yearFilter">
         <option value="2025">2025</option>
-        <option value="2023">2024</option>
+        <option value="2024">2024</option>
         <option value="2023">2023</option>
       </select>
     </div>
@@ -207,7 +246,15 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Loyal Customers Chart -->
+    <div class="loyal-customers-box">
+      <h3>Top Buyers</h3>
+      <div id="loyalCustomersList">
+        <p class="loading-text">Loading loyal customers...</p>
+      </div>
+    </div>
+   
 
   <script>
     $(document).ready(function () {
