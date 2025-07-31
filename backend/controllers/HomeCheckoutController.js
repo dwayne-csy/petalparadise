@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // 🏠 Home page - Single product checkout preparation
 exports.prepareSoloCheckout = (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user?.id || req.user?.userId || req.userId;
     const { productId } = req.body;
 
     if (!productId) {

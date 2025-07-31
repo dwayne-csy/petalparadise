@@ -29,6 +29,7 @@ const orderRoutes = require('./routes/order');
 const reviewRoutes = require('./routes/review');
 const manageReviewRoutes = require('./routes/managereview');
 const salesChartRoutes = require('./routes/saleschart');
+const landingRoutes = require('./routes/landing');
 
 
 
@@ -47,6 +48,8 @@ app.use('/api/v1', orderRoutes);
 app.use('/api/v1', reviewRoutes);
 app.use('/api/v1/', manageReviewRoutes);
 app.use('/api/v1/', salesChartRoutes);
+app.use('/api/v1/', landingRoutes);
+
 
 
 // ✅ Start server

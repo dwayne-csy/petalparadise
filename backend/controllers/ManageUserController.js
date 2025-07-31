@@ -86,7 +86,7 @@ exports.downloadUsersPDF = (req, res) => {
                 .fillColor('#6a1b9a')
                 .fontSize(20)
                 .font('Helvetica-Bold')
-                .text('Ø<ß8 Petal Paradise', { align: 'center' })
+                .text('Petal Paradise', { align: 'center' })
                 .moveDown(0.2)
                 .fontSize(14)
                 .font('Helvetica')

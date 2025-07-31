@@ -303,7 +303,7 @@ exports.downloadOrdersPDF = (req, res) => {
                 .fillColor('#6a1b9a')
                 .fontSize(20)
                 .font('Helvetica-Bold')
-                .text('Ø<ß8 Petal Paradise', { align: 'center' })
+                .text('Petal Paradise', { align: 'center' })
                 .moveDown(0.2)
                 .fontSize(14)
                 .font('Helvetica')
@@ -344,7 +344,7 @@ exports.downloadOrdersPDF = (req, res) => {
                     .text(new Date(order.created_at).toLocaleDateString(), colX.date, rowY)
                     .text(order.customer_name.length > 20 ? order.customer_name.substring(0, 20) + '…' : order.customer_name, colX.customer, rowY)
                     .text(order.status, colX.status, rowY)
-                    .text(Number(order.total_amount).toFixed(2) + ' ₱', colX.total, rowY);
+                    .text(Number(order.total_amount).toFixed(2) + ' ', colX.total, rowY);
             });
 
             // Footer

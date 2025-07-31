@@ -288,7 +288,7 @@ exports.downloadPDF = (req, res) => {
             .fillColor('#6a1b9a')
             .fontSize(20)
             .font('Helvetica-Bold')
-            .text('Ø<ß8 Petal Paradise', { align: 'center' })
+            .text('Petal Paradise', { align: 'center' })
             .moveDown(0.2)
             .fontSize(14)
             .font('Helvetica')
@@ -335,7 +335,7 @@ exports.downloadPDF = (req, res) => {
                 .text(prod.name.length > 18 ? prod.name.substring(0, 18) + '…' : prod.name, colX.name, rowY)
                 .text(prod.category, colX.category, rowY)
                 .text(prod.usage_type, colX.usage, rowY)
-                .text(`₱${Number(prod.price).toFixed(2)}`, colX.price + 50 - doc.widthOfString(`₱${Number(prod.price).toFixed(2)}`), rowY)
+                .text(`${Number(prod.price).toFixed(2)}`, colX.price + 50 - doc.widthOfString(`${Number(prod.price).toFixed(2)}`), rowY)
                 .text(prod.stock.toString(), colX.stock + 40 - doc.widthOfString(prod.stock.toString()), rowY);
         });
 
@@ -346,4 +346,3 @@ exports.downloadPDF = (req, res) => {
         doc.end();
     });
 };
-
